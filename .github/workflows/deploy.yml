@@ -59,14 +59,6 @@ jobs:
             key: ${{ secrets.EC2_PRIVATE_KEY }}
             script_stop: true
             script: |
-#              rm -rf /home/ubuntu/cicd-server/current
-#              mkdir /home/ubuntu/cicd-server/current
-#              mv /home/ubuntu/cicd-server/tobe/project.jar /home/ubuntu/cicd-server/current/project.jar
-#              cd /home/ubuntu/cicd-server/current
-#              sudo fuser -k -n tcp 8080 || true
-#              nohup java -jar project.jar > ./output.log 2>&1 &
-#              rm -rf /home/ubuntu/cicd-server/tobe
-
               cd /home/ubuntu/cicd-server
               git pull origin main
               ./gradlew clean
