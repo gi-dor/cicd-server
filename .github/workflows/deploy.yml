@@ -33,6 +33,9 @@ jobs:
       - name: application.properties 파일만들기
         run: echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
 
+      - name: gradle 권한
+        run: chmod +x ./gradlew
+
       - name: 테스트 및 빌드하기
         run: ./gradlew clean build
 
