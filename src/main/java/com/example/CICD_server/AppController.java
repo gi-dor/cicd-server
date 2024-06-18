@@ -10,6 +10,6 @@ public class AppController {
 
     @GetMapping("/")
     public String home() {
-        return "HI World";
+        return "Test CICD Github Actions";
     }
 }
