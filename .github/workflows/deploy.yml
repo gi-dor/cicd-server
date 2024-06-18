@@ -29,9 +29,8 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script_stop: true # 아래 script 중 실패하는 명령이 하나라도 있으면 실패로 처리
           script: |
-            cd /home/ubuntu/cicd-server
+            cd /home/ubuntu/CICD-server
             git pull origin main
-            ./gradlew clean
-            ./gradlew build
+            ./gradlew clean build
             sudo fuser -k -n tcp 8080 || true
             nohup java -jar build/libs/*SNAPSHOT.jar > ./output.log 2>&1 &
