@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: JDK 17 버전 설치하기
-        uses: actions/setup-java@4
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
@@ -48,7 +48,7 @@ jobs:
           source: project.jar
           target: /home/ubuntu/cicd-server/tobe
 
-      - name: Connect to EC2 via SSH and deploy
+      - name: SSH(원격 접속)로 EC2에 접속하기
         uses: appleboy/ssh-action@v0.1.4
         with:
             host: ${{ secrets.EC2_HOST }}
