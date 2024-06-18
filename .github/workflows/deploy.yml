@@ -49,7 +49,7 @@ jobs:
           target: /home/ubuntu/cicd-server/tobe
 
       - name: Connect to EC2 via SSH and deploy
-        uses: appleboy/ssh-action@v0.1.7
+        uses: appleboy/ssh-action@v0.1.4
         with:
             host: ${{ secrets.EC2_HOST }}
             username: ${{ secrets.EC2_USERNAME }}
