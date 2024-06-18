@@ -60,7 +60,7 @@ jobs:
           script: |
             rm -rf /home/ubuntu/cicd-server/current
             mkdir /home/ubuntu/cicd-server/current
-            mv /home/ubuntu/cicd-server/tobe/project/jar /home/ubuntu/cicd-server/current/project.jar
+            mv /home/ubuntu/cicd-server/tobe/project.jar /home/ubuntu/cicd-server/current/project.jar
             cd /home/ubuntu/cicd-server/current
 #           실행될수 있으니 서버 일단 끔
             sudo fuser -k -n tcp 8080 || true
