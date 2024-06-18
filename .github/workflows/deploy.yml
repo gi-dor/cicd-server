@@ -50,22 +50,22 @@ jobs:
 
 
 
-      - name : SSH(원격 접속)로 EC2에 접속하기
+      - name: SSH로 EC2에 접속하기
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          script_stop: true # 아래 script 중 실패하는 명령이 하나라도 있으면 실패로 처리
-          script: |
-            rm -rf /home/ubuntu/cicd-server/current
-            mkdir /home/ubuntu/cicd-server/current
-            mv /home/ubuntu/cicd-server/tobe/project.jar /home/ubuntu/cicd-server/current/project.jar
-            cd /home/ubuntu/cicd-server/current
-#           실행될수 있으니 서버 일단 끔
-            sudo fuser -k -n tcp 8080 || true
-            nohup java -jar project.jar > ./output.log 2>&1 & 
-            rm -rf /home/ubuntu/cicd-server/tobe
+            host: ${{ secrets.EC2_HOST }}
+            username: ${{ secrets.EC2_USERNAME }}
+            key: ${{ secrets.EC2_PRIVATE_KEY }}
+            script_stop: true # 아래 script 중 실패하는 명령이 하나라도 있으면 실패로 처리
+            script: |
+              rm -rf /home/ubuntu/cicd-server/current
+              mkdir /home/ubuntu/cicd-server/current
+              mv /home/ubuntu/cicd-server/tobe/project.jar /home/ubuntu/cicd-server/current/project.jar
+              cd /home/ubuntu/cicd-server/current
+  #           실행될수 있으니 서버 일단 끔
+              sudo fuser -k -n tcp 8080 || true
+              nohup java -jar project.jar > ./output.log 2>&1 & 
+              rm -rf /home/ubuntu/cicd-server/tobe
 
 #            cd /home/ubuntu/cicd-server
 #            git pull origin main
