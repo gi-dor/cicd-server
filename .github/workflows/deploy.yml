@@ -21,35 +21,35 @@ jobs:
     # Step : 특정 작업을 수행하는 가장 작은 단위
     # Job은 여러 Step들로 구성되어 있다.
     steps:
-      - name: Github Repository 에 올린 파일 불러오기
-        uses: actions/checkout@v4
-
-      - name: JDK 17 버전 설치하기
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-
-      - name: application.properties 파일만들기
-        run: echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
-
-      - name: gradle 권한
-        run: chmod +x ./gradlew
-
-      - name: 테스트 및 빌드하기
-        run: ./gradlew clean build
-
-      - name: 빌드된 파일 이름 변경하기
-        run: mv ./build/libs/*SNAPSHOT.jar ./project.jar
-
-      - name: SCP로 EC2에 빌드된 파일 전송하기
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          source: project.jar
-          target: /home/ubuntu/cicd-server/tobe
+#      - name: Github Repository 에 올린 파일 불러오기
+#        uses: actions/checkout@v4
+#
+#      - name: JDK 17 버전 설치하기
+#        uses: actions/setup-java@v4
+#        with:
+#          distribution: temurin
+#          java-version: 17
+#
+#      - name: application.properties 파일만들기
+#        run: echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
+#
+#      - name: gradle 권한
+#        run: chmod +x ./gradlew
+#
+#      - name: 테스트 및 빌드하기
+#        run: ./gradlew clean build
+#
+#      - name: 빌드된 파일 이름 변경하기
+#        run: mv ./build/libs/*SNAPSHOT.jar ./project.jar
+#
+#      - name: SCP로 EC2에 빌드된 파일 전송하기
+#        uses: appleboy/scp-action@v0.1.7
+#        with:
+#          host: ${{ secrets.EC2_HOST }}
+#          username: ${{ secrets.EC2_USERNAME }}
+#          key: ${{ secrets.EC2_PRIVATE_KEY }}
+#          source: project.jar
+#          target: /home/ubuntu/cicd-server/tobe
 
       - name: SSH(원격 접속)로 EC2에 접속하기
         uses: appleboy/ssh-action@v0.1.4
@@ -59,17 +59,17 @@ jobs:
             key: ${{ secrets.EC2_PRIVATE_KEY }}
             script_stop: true
             script: |
-              rm -rf /home/ubuntu/cicd-server/current
-              mkdir /home/ubuntu/cicd-server/current
-              mv /home/ubuntu/cicd-server/tobe/project.jar /home/ubuntu/cicd-server/current/project.jar
-              cd /home/ubuntu/cicd-server/current
-              sudo fuser -k -n tcp 8080 || true
-              nohup java -jar project.jar > ./output.log 2>&1 &
-              rm -rf /home/ubuntu/cicd-server/tobe
+#              rm -rf /home/ubuntu/cicd-server/current
+#              mkdir /home/ubuntu/cicd-server/current
+#              mv /home/ubuntu/cicd-server/tobe/project.jar /home/ubuntu/cicd-server/current/project.jar
+#              cd /home/ubuntu/cicd-server/current
+#              sudo fuser -k -n tcp 8080 || true
+#              nohup java -jar project.jar > ./output.log 2>&1 &
+#              rm -rf /home/ubuntu/cicd-server/tobe
 
-#            cd /home/ubuntu/cicd-server
-#            git pull origin main
-#            ./gradlew clean
-#            ./gradlew bootJar
-#            sudo fuser -k -n tcp 8080 || true
-#            nohup java -jar build/libs/*SNAPSHOT.jar > ./output.log 2>&1 &
+              cd /home/ubuntu/cicd-server
+              git pull origin main
+              ./gradlew clean
+              ./gradlew bootJar
+              sudo fuser -k -n tcp 8080 || true
+              nohup java -jar build/libs/*SNAPSHOT.jar > ./output.log 2>&1 &
