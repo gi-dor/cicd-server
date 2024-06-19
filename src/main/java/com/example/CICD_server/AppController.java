@@ -10,6 +10,6 @@ public class AppController {
 
     @GetMapping("/")
     public String home() {
-        return "Test CICD Github Actions";
+        return "final Test CI/CD CodeDeploy with EC2 , S3 ";
     }
 }
