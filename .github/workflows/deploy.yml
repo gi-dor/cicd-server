@@ -1,27 +1,42 @@
-# Workflow의 이름
-# Workflow : 하나의 yml 파일을 하나의 Workflow라고 부른다.
-name: Deploy To EC2 Test
+name: Deploy To EC2
 
-# Event : 실행되는 시점을 설정
-# main이라는 브랜치에 push 될 때 아래 Workflow를 실행
 on:
   push:
     branches:
       - main
 
-# 하나의 Workflow는 1개 이상의 Job으로 구성된다.
-# 여러 Job은 기본적으로 병렬적으로 수행된다.
 jobs:
-  # Job을 식별하기 위한 id
   deploy:
-    # Github Actions를 실행시킬 서버 종류 선택
-    # ubuntu 환경 / 가장최신버전 latest
     runs-on: ubuntu-latest
-
-    # Step : 특정 작업을 수행하는 가장 작은 단위
-    # Job은 여러 Step들로 구성되어 있다.
     steps:
-      - name: SSH(원격 접속)로 EC2에 접속하기
+      - name: Github Repository 파일 불러오기
+        uses: actions/checkout@v4
+
+      - name: JDK 17버전 설치
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: application.yml 파일 만들기
+        run: echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
+
+      - name: 테스트 및 빌드하기
+        run: ./gradlew clean build
+
+      - name: 빌드된 파일 이름 변경하기
+        run: mv ./build/libs/*SNAPSHOT.jar ./project.jar
+
+      - name: SCP로 EC2에 빌드된 파일 전송하기
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          source: project.jar
+          target: /home/ubuntu/cicd-server/tobe
+
+      - name: SSH로 EC2에 접속하기
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -29,9 +44,50 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script_stop: true
           script: |
-            cd /home/ubuntu/cicd-server
-            git pull origin main
-            ./gradlew clean
-            ./gradlew bootJar
+            rm -rf /home/ubuntu/cicd-server/current
+            mkdir /home/ubuntu/cicd-server/current
+            mv /home/ubuntu/cicd-server/tobe/project.jar /home/ubuntu/cicd-server/current/project.jar
+            cd /home/ubuntu/cicd-server/current
             sudo fuser -k -n tcp 8080 || true
-            nohup java -jar build/libs/*SNAPSHOT.jar > ./output.log 2>&1 &
+            nohup java -jar project.jar > ./output.log 2>&1 & 
+            rm -rf /home/ubuntu/cicd-server/tobe
+
+
+
+## Workflow의 이름
+## Workflow : 하나의 yml 파일을 하나의 Workflow라고 부른다.
+#name: Deploy To EC2 Test
+#
+## Event : 실행되는 시점을 설정
+## main이라는 브랜치에 push 될 때 아래 Workflow를 실행
+#on:
+#  push:
+#    branches:
+#      - main
+#
+## 하나의 Workflow는 1개 이상의 Job으로 구성된다.
+## 여러 Job은 기본적으로 병렬적으로 수행된다.
+#jobs:
+#  # Job을 식별하기 위한 id
+#  deploy:
+#    # Github Actions를 실행시킬 서버 종류 선택
+#    # ubuntu 환경 / 가장최신버전 latest
+#    runs-on: ubuntu-latest
+#
+#    # Step : 특정 작업을 수행하는 가장 작은 단위
+#    # Job은 여러 Step들로 구성되어 있다.
+#    steps:
+#      - name: SSH(원격 접속)로 EC2에 접속하기
+#        uses: appleboy/ssh-action@v1.0.3
+#        with:
+#          host: ${{ secrets.EC2_HOST }}
+#          username: ${{ secrets.EC2_USERNAME }}
+#          key: ${{ secrets.EC2_PRIVATE_KEY }}
+#          script_stop: true
+#          script: |
+#            cd /home/ubuntu/cicd-server
+#            git pull origin main
+#            ./gradlew clean
+#            ./gradlew bootJar
+#            sudo fuser -k -n tcp 8080 || true
+#            nohup java -jar build/libs/*SNAPSHOT.jar > ./output.log 2>&1 &
